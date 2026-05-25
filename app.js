@@ -1,4 +1,14 @@
 const STORAGE_KEY = "guzel_kuafor_randevular";
+const PASS_KEY = "guzel_kuafor_admin_pass";
+const ADMIN_USER_KEY = "guzel_kuafor_admin_user";
+
+// مقادیر پیش‌فرض ادمین (فقط اگه وجود نداشت)
+if (!localStorage.getItem(PASS_KEY)) {
+  localStorage.setItem(PASS_KEY, "9122449512");
+}
+if (!localStorage.getItem(ADMIN_USER_KEY)) {
+  localStorage.setItem(ADMIN_USER_KEY, "admin");
+}
 
 function getRandevularFromStorage() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -17,14 +27,64 @@ function toggleMenu() {
   overlay.style.display = menu.classList.contains("show") ? "block" : "none";
 }
 
-// دراپ‌داون‌ها
+// ===================== متغیرهای اصلی =====================
+const modalOverlay = document.getElementById("randevuModal");
+let selectedDateStr = "";
+let selectedSlotStr = "";
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth();
+
+// ===================== ورود ادمین از طریق لوگو =====================
+const adminLoginModal = document.getElementById("adminLoginModal");
+const logoSection = document.querySelector(".logo-section");
+
+logoSection.addEventListener("click", (e) => {
+  e.preventDefault();
+  document.getElementById("adminLoginUser").value = "";
+  document.getElementById("adminLoginPass").value = "";
+  document.getElementById("adminLoginError").style.display = "none";
+  adminLoginModal.style.display = "flex";
+});
+
+document.getElementById("closeAdminLogin").addEventListener("click", () => {
+  adminLoginModal.style.display = "none";
+});
+
+adminLoginModal.addEventListener("click", (e) => {
+  if (e.target === adminLoginModal) adminLoginModal.style.display = "none";
+});
+
+document.getElementById("btnAdminLoginConfirm").addEventListener("click", () => {
+  const user = document.getElementById("adminLoginUser").value.trim();
+  const pass = document.getElementById("adminLoginPass").value.trim();
+  const storedUser = localStorage.getItem(ADMIN_USER_KEY) || "admin";
+  const storedPass = localStorage.getItem(PASS_KEY) || "9122449512";
+
+  if (user === storedUser && pass === storedPass) {
+    adminLoginModal.style.display = "none";
+    modalOverlay.classList.add("open");
+    document.getElementById("stepUserAuth").classList.add("step-hidden");
+    document.getElementById("stepNewRandevu").classList.add("step-hidden");
+    document.getElementById("stepExistingUser").classList.add("step-hidden");
+    document.getElementById("modalMainTitle").style.display = "none";
+    document.getElementById("modalBox").classList.add("admin-mode");
+    document.getElementById("stepAdminPanel").classList.remove("step-hidden");
+    updateLiveStatsAndTable();
+  } else {
+    document.getElementById("adminLoginError").style.display = "block";
+  }
+});
+
+document.getElementById("adminLoginPass").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("btnAdminLoginConfirm").click();
+});
+
+// ===================== دراپ‌داون‌ها =====================
 const dropdowns = document.querySelectorAll(".dropdown-wrapper");
 const openRandevuBtn = document.getElementById("openRandevuBtn");
 
 function checkDropdownSelection() {
-  const aktivite = document
-    .getElementById("selectedAktiviteText")
-    .innerText.trim();
+  const aktivite = document.getElementById("selectedAktiviteText").innerText.trim();
   const kuafor = document.getElementById("selectedKuaforText").innerText.trim();
   if (aktivite !== "Uygulama Seç" && kuafor !== "Kuaför Seç") {
     openRandevuBtn.classList.remove("btn-disabled");
@@ -40,9 +100,7 @@ dropdowns.forEach((dropdown) => {
   if (button && menu && button.id !== "openRandevuBtn") {
     button.addEventListener("click", (e) => {
       e.stopPropagation();
-      dropdowns.forEach((d) => {
-        if (d !== dropdown) d.classList.remove("active");
-      });
+      dropdowns.forEach((d) => { if (d !== dropdown) d.classList.remove("active"); });
       dropdown.classList.toggle("active");
     });
 
@@ -54,10 +112,7 @@ dropdowns.forEach((dropdown) => {
           document.getElementById("selectedAktiviteText").innerText = text;
           const container = document.getElementById("aktiviteIconContainer");
           const icon = item.querySelector("i");
-          if (icon) {
-            container.innerHTML = "";
-            container.appendChild(icon.cloneNode(true));
-          }
+          if (icon) { container.innerHTML = ""; container.appendChild(icon.cloneNode(true)); }
         }
 
         if (dropdown.id === "kuaforWrapper") {
@@ -81,16 +136,10 @@ dropdowns.forEach((dropdown) => {
 });
 
 document.addEventListener("click", () =>
-  dropdowns.forEach((d) => d.classList.remove("active")),
+  dropdowns.forEach((d) => d.classList.remove("active"))
 );
 
-// مدال
-const modalOverlay = document.getElementById("randevuModal");
-let selectedDateStr = "";
-let selectedSlotStr = "";
-let currentYear = new Date().getFullYear();
-let currentMonth = new Date().getMonth();
-
+// ===================== مدال رزرو =====================
 document.getElementById("openRandevuBtn").addEventListener("click", () => {
   if (openRandevuBtn.classList.contains("btn-disabled")) {
     alert("Lütfen önce Aktivite ve Kuaför seçimi yapınız.");
@@ -104,6 +153,10 @@ document.querySelectorAll(".btnCloseModal").forEach((btn) => {
   btn.addEventListener("click", () => modalOverlay.classList.remove("open"));
 });
 
+modalOverlay.addEventListener("click", (e) => {
+  if (e.target === modalOverlay) modalOverlay.classList.remove("open");
+});
+
 function resetRandevuForm() {
   document.getElementById("stepUserAuth").classList.remove("step-hidden");
   document.getElementById("stepNewRandevu").classList.add("step-hidden");
@@ -111,34 +164,18 @@ function resetRandevuForm() {
   document.getElementById("stepAdminPanel").classList.add("step-hidden");
   document.getElementById("modalBox").classList.remove("admin-mode");
   document.getElementById("modalMainTitle").style.display = "block";
-
   document.getElementById("inputFullName").value = "";
   document.getElementById("inputPhone").value = "";
   selectedDateStr = "";
   selectedSlotStr = "";
   document.getElementById("slotsSection").classList.add("disabled-area");
   document.getElementById("btnSaveRandevu").disabled = true;
-  document
-    .querySelectorAll(".slot-item")
-    .forEach((s) => s.classList.remove("selected"));
+  document.querySelectorAll(".slot-item").forEach((s) => s.classList.remove("selected"));
   renderCalendar();
 }
 
-// تقویم
-const monthNamesTr = [
-  "Ocak",
-  "Şubat",
-  "Mart",
-  "Nisan",
-  "Mayıs",
-  "Haziran",
-  "Temmuz",
-  "Ağustos",
-  "Eylül",
-  "Ekim",
-  "Kasım",
-  "Aralık",
-];
+// ===================== تقویم =====================
+const monthNamesTr = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
 
 function renderCalendar() {
   const titleEl = document.getElementById("calendarTitle");
@@ -171,14 +208,10 @@ function renderCalendar() {
       daySpan.classList.add("past-day");
     } else {
       daySpan.addEventListener("click", () => {
-        document
-          .querySelectorAll("#calendarDays span")
-          .forEach((s) => s.classList.remove("selected"));
+        document.querySelectorAll("#calendarDays span").forEach((s) => s.classList.remove("selected"));
         daySpan.classList.add("selected");
         selectedDateStr = dateStr;
-        document
-          .getElementById("slotsSection")
-          .classList.remove("disabled-area");
+        document.getElementById("slotsSection").classList.remove("disabled-area");
         checkFormCompletion();
       });
     }
@@ -188,32 +221,19 @@ function renderCalendar() {
 
 document.getElementById("prevMonth").addEventListener("click", () => {
   currentMonth--;
-  if (currentMonth < 0) {
-    currentMonth = 11;
-    currentYear--;
-  }
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
   renderCalendar();
 });
 document.getElementById("nextMonth").addEventListener("click", () => {
   currentMonth++;
-  if (currentMonth > 11) {
-    currentMonth = 0;
-    currentYear++;
-  }
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
   renderCalendar();
 });
 
 document.querySelectorAll(".slot-item").forEach((slot) => {
   slot.addEventListener("click", () => {
-    if (
-      document
-        .getElementById("slotsSection")
-        .classList.contains("disabled-area")
-    )
-      return;
-    document
-      .querySelectorAll(".slot-item")
-      .forEach((s) => s.classList.remove("selected"));
+    if (document.getElementById("slotsSection").classList.contains("disabled-area")) return;
+    document.querySelectorAll(".slot-item").forEach((s) => s.classList.remove("selected"));
     slot.classList.add("selected");
     selectedSlotStr = slot.getAttribute("data-slot");
     checkFormCompletion();
@@ -221,48 +241,28 @@ document.querySelectorAll(".slot-item").forEach((slot) => {
 });
 
 function checkFormCompletion() {
-  document.getElementById("btnSaveRandevu").disabled = !(
-    selectedDateStr && selectedSlotStr
-  );
+  document.getElementById("btnSaveRandevu").disabled = !(selectedDateStr && selectedSlotStr);
 }
 
-// ذخیره رزرو
+// ===================== ذخیره رزرو =====================
 document.getElementById("btnSaveRandevu").addEventListener("click", () => {
   const fullName = document.getElementById("inputFullName").value.trim();
   const phone = document.getElementById("inputPhone").value.trim();
-  const aktivite = document
-    .getElementById("selectedAktiviteText")
-    .innerText.trim();
+  const aktivite = document.getElementById("selectedAktiviteText").innerText.trim();
   const kuafor = document.getElementById("selectedKuaforText").innerText.trim();
 
   if (!fullName || !phone || !selectedDateStr || !selectedSlotStr) return;
 
   let list = getRandevularFromStorage();
   const index = list.findIndex(
-    (item) =>
-      item.fullName.toLowerCase() === fullName.toLowerCase() &&
-      item.phone === phone,
+    (item) => item.fullName.toLowerCase() === fullName.toLowerCase() && item.phone === phone
   );
 
   if (index !== -1) {
-    list[index] = {
-      fullName,
-      phone,
-      aktivite,
-      kuafor,
-      date: selectedDateStr,
-      slot: selectedSlotStr,
-    };
+    list[index] = { fullName, phone, aktivite, kuafor, date: selectedDateStr, slot: selectedSlotStr };
     alert("Randevunuz başarıyla güncellendi.");
   } else {
-    list.push({
-      fullName,
-      phone,
-      aktivite,
-      kuafor,
-      date: selectedDateStr,
-      slot: selectedSlotStr,
-    });
+    list.push({ fullName, phone, aktivite, kuafor, date: selectedDateStr, slot: selectedSlotStr });
     alert("Randevunuz başarıyla kaydedildi.");
   }
 
@@ -270,7 +270,7 @@ document.getElementById("btnSaveRandevu").addEventListener("click", () => {
   modalOverlay.classList.remove("open");
 });
 
-// چک کاربر و ادمین
+// ===================== چک کاربر (بدون ورود ادمین) =====================
 document.getElementById("btnCheckUser").addEventListener("click", () => {
   const fullName = document.getElementById("inputFullName").value.trim();
   const phone = document.getElementById("inputPhone").value.trim();
@@ -280,20 +280,9 @@ document.getElementById("btnCheckUser").addEventListener("click", () => {
     return;
   }
 
-  if (fullName === "admin" && phone === "9122449512") {
-    document.getElementById("stepUserAuth").classList.add("step-hidden");
-    document.getElementById("modalMainTitle").style.display = "none";
-    document.getElementById("modalBox").classList.add("admin-mode");
-    document.getElementById("stepAdminPanel").classList.remove("step-hidden");
-    updateLiveStatsAndTable();
-    return;
-  }
-
   const list = getRandevularFromStorage();
   const exists = list.some(
-    (item) =>
-      item.fullName.toLowerCase() === fullName.toLowerCase() &&
-      item.phone === phone,
+    (item) => item.fullName.toLowerCase() === fullName.toLowerCase() && item.phone === phone
   );
 
   document.getElementById("stepUserAuth").classList.add("step-hidden");
@@ -312,14 +301,9 @@ document.getElementById("btnEditExisting").addEventListener("click", () => {
 document.getElementById("btnCancelExisting").addEventListener("click", () => {
   if (confirm("Randevunuzu iptal etmek istediğinizden emin misiniz?")) {
     let list = getRandevularFromStorage();
-    const name = document
-      .getElementById("inputFullName")
-      .value.trim()
-      .toLowerCase();
+    const name = document.getElementById("inputFullName").value.trim().toLowerCase();
     const phone = document.getElementById("inputPhone").value.trim();
-    list = list.filter(
-      (item) => !(item.fullName.toLowerCase() === name && item.phone === phone),
-    );
+    list = list.filter((item) => !(item.fullName.toLowerCase() === name && item.phone === phone));
     saveRandevularToStorage(list);
     alert("Randevunuz iptal edildi.");
     modalOverlay.classList.remove("open");
@@ -331,39 +315,36 @@ document.getElementById("btnBackToAuth").addEventListener("click", () => {
   document.getElementById("stepUserAuth").classList.remove("step-hidden");
 });
 
-document
-  .getElementById("btnAdminBack")
-  .addEventListener("click", () => modalOverlay.classList.remove("open"));
-
+// ===================== جدول ادمین =====================
 function updateLiveStatsAndTable() {
   const list = getRandevularFromStorage();
-  document.getElementById("liveStatsCount").innerText = list.length;
+  const statsEl = document.getElementById("liveStatsCount");
+  if (statsEl) statsEl.innerText = list.length;
 
   const tbody = document.getElementById("adminTableBody");
+  if (!tbody) return;
+
   if (list.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Henüz randevu kaydı yok.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = list
-    .slice()
-    .reverse()
-    .map((item, idx) => {
-      const realIndex = list.length - 1 - idx;
-      return `
-            <tr>
-              <td><strong>${item.fullName}</strong></td>
-              <td>${item.phone}</td>
-              <td><span class="badge badge-aktivite">${item.aktivite}</span></td>
-              <td><span class="badge badge-kuafor">${item.kuafor}</span></td>
-              <td><span class="badge badge-date">${item.date} - ${item.slot}</span></td>
-              <td><button class="btn-delete-row" onclick="deleteSingleRandevu(${realIndex})">Sil</button></td>
-            </tr>`;
-    })
-    .join("");
+  tbody.innerHTML = list.slice().reverse().map((item, idx) => {
+    const realIndex = list.length - 1 - idx;
+    return `
+      <tr>
+        <td><strong>${item.fullName}</strong></td>
+        <td>${item.phone}</td>
+        <td><span class="badge badge-aktivite">${item.aktivite}</span></td>
+        <td><span class="badge badge-kuafor">${item.kuafor}</span></td>
+        <td><span class="badge badge-date">${item.date} - ${item.slot}</span></td>
+        <td><button class="btn-delete-row" onclick="deleteSingleRandevu(${realIndex}, event)">Sil</button></td>
+      </tr>`;
+  }).join("");
 }
 
-window.deleteSingleRandevu = function (index) {
+window.deleteSingleRandevu = function (index, e) {
+  if (e) e.stopPropagation();
   if (confirm("Bu randevuyu silmek istediğinizden emin misiniz?")) {
     let list = getRandevularFromStorage();
     list.splice(index, 1);
@@ -371,27 +352,77 @@ window.deleteSingleRandevu = function (index) {
   }
 };
 
-document.getElementById("btnClearStorage").addEventListener("click", () => {
+document.getElementById("btnClearStorage").addEventListener("click", (e) => {
+  e.stopPropagation();
   if (confirm("Tüm randevuları silmek istediğinizden emin misiniz?")) {
     localStorage.removeItem(STORAGE_KEY);
     updateLiveStatsAndTable();
   }
 });
 
-// بستن خودکار منو موبایل بعد از کلیک روی آیتم
+// ===================== تغییر پسورد =====================
+const passModal = document.getElementById("passwordModal");
+const btnChangePassword = document.getElementById("btnChangePassword");
+const closePassModal = document.getElementById("closePassModal");
+const savePassBtn = document.getElementById("savePassBtn");
+
+btnChangePassword.addEventListener("click", (e) => {
+  e.stopPropagation();
+  // پاک کردن فیلدها هر بار که مدال باز میشه
+  document.getElementById("oldPass").value = "";
+  document.getElementById("newPass").value = "";
+  document.getElementById("confirmNewPass").value = "";
+  passModal.classList.remove("step-hidden");
+});
+
+closePassModal.addEventListener("click", (e) => {
+  e.stopPropagation();
+  passModal.classList.add("step-hidden");
+});
+
+passModal.addEventListener("click", (e) => {
+  if (e.target === passModal) passModal.classList.add("step-hidden");
+});
+
+savePassBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const oldPass = document.getElementById("oldPass").value;
+  const newPass = document.getElementById("newPass").value;
+  const confirmNewPass = document.getElementById("confirmNewPass").value;
+
+  const currentStoredPass = localStorage.getItem(PASS_KEY) || "9122449512";
+
+  if (oldPass !== currentStoredPass) {
+    alert("Eski şifre hatalı!");
+    return;
+  }
+  if (newPass !== confirmNewPass) {
+    alert("Yeni şifreler eşleşmiyor!");
+    return;
+  }
+  if (newPass.length < 4) {
+    alert("Şifre en az 4 karakter olmalıdır!");
+    return;
+  }
+
+  localStorage.setItem(PASS_KEY, newPass);
+  alert("Şifre başarıyla güncellendi!");
+  passModal.classList.add("step-hidden");
+});
+
+// ===================== موبایل منو =====================
 document.querySelectorAll(".main-navigation-menu a").forEach((link) => {
   link.addEventListener("click", () => {
     const menu = document.getElementById("mainMenu");
     const overlay = document.getElementById("menuOverlay");
-
     if (window.innerWidth <= 768) {
-      // فقط در موبایل
       menu.classList.remove("show");
       overlay.style.display = "none";
     }
   });
 });
-// شروع
+
+// ===================== شروع =====================
 window.addEventListener("DOMContentLoaded", () => {
   updateLiveStatsAndTable();
   checkDropdownSelection();

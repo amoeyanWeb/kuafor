@@ -442,7 +442,7 @@
         </p>
 
         <div class="reviews-grid">
-          <!-- Yorum 1 -->
+          <!-- Yorum 1 ------>
           <div class="review-card">
             <div class="stars">★★★★★</div>
             <h3>En iyi kuaför deneyimi</h3>
@@ -710,14 +710,25 @@
           </div>
         </div>
 
+        <!-- جایگزین بخش stepAdminPanel در فایل index.html -->
         <div id="stepAdminPanel" class="step-hidden admin-modal-wrapper">
-          <div class="admin-title-area">
-            <h3>Yönetim Paneli (Admin)</h3>
-            <button class="btn-clear-all" id="btnClearStorage" type="button">
-              Tüm Kayıtları Temizle 🗑
-            </button>
+          <div class="admin-header">
+            <h3>Yönetim Paneli</h3>
           </div>
-          <div class="table-responsive">
+          <div class="admin-actions">
+            <button class="btn btn-warning" id="btnClearStorage">
+              Tümünü Sil
+            </button>
+            <button class="btn btn-primary" id="btnChangePassword">
+              Şifre Değiştir
+            </button>
+            <!-- <button class="btn btn-secondary" id="btnAdminBack">
+              Çıkış Yap
+            </button> -->
+          </div>
+
+          <!-- جدول -->
+          <div class="table-responsive" style="margin-top: 20px">
             <table class="admin-table">
               <thead>
                 <tr>
@@ -732,10 +743,160 @@
               <tbody id="adminTableBody"></tbody>
             </table>
           </div>
-          <button class="btn btn-secondary" id="btnAdminBack" type="button">
-            Çıkış Yap
-          </button>
         </div>
+        <!-- <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Müşteri</th>
+                <th>Telefon</th>
+                <th>İşlem</th>
+                <th>Kuaför</th>
+                <th>Tarih & Saat</th>
+                <th>İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </div> -->
+        <!-- دکمه خروج اینجابود -->
+      </div>
+    </div>
+    <!-- مدال تغییر رمز عبور -->
+    <div
+      id="passwordModal"
+      class="step-hidden"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: #fff;
+          padding: 25px;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 400px;
+          position: relative;
+        "
+      >
+        <button
+          id="closePassModal"
+          style="
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 20px;
+          "
+        >
+          ✖
+        </button>
+        <h3 style="margin-bottom: 15px">Şifre Değiştir</h3>
+        <input
+          type="password"
+          id="oldPass"
+          placeholder="Eski Şifre"
+          style="
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+          "
+        />
+        <input
+          type="password"
+          id="newPass"
+          placeholder="Yeni Şifre"
+          style="
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+          "
+        />
+        <input
+          type="password"
+          id="confirmNewPass"
+          placeholder="Yeni Şifre (Tekrar)"
+          style="
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+          "
+        />
+        <button
+          id="savePassBtn"
+          class="btn btn-primary"
+          style="
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #0d6efd;
+            color: white;
+          "
+        >
+          Şifreyi Güncelle
+        </button>
+      </div>
+    </div>
+    <!-- ===================== مدال لوگین ادمین ===================== -->
+    <div id="adminLoginModal" style="
+      display:none;
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.6);
+      justify-content:center;align-items:center;
+      z-index:99999;
+    ">
+      <div style="
+        background:#fff;padding:32px 28px;border-radius:16px;
+        width:90%;max-width:360px;position:relative;
+        box-shadow:0 20px 60px rgba(0,0,0,0.3);
+      ">
+        <button id="closeAdminLogin" style="
+          position:absolute;top:12px;right:14px;
+          border:none;background:none;cursor:pointer;font-size:22px;color:#888;
+        ">✖</button>
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="font-size:32px;margin-bottom:6px;">🔐</div>
+          <h3 style="margin:0;font-size:18px;color:#333;">Yönetici Girişi</h3>
+        </div>
+        <input type="text" id="adminLoginUser" placeholder="Kullanıcı Adı" style="
+          width:100%;padding:11px 14px;margin-bottom:12px;
+          border:1.5px solid #ddd;border-radius:8px;font-size:14px;
+          box-sizing:border-box;outline:none;
+        "/>
+        <input type="password" id="adminLoginPass" placeholder="Şifre" style="
+          width:100%;padding:11px 14px;margin-bottom:8px;
+          border:1.5px solid #ddd;border-radius:8px;font-size:14px;
+          box-sizing:border-box;outline:none;
+        "/>
+        <div id="adminLoginError" style="
+          display:none;color:#e74c3c;font-size:13px;
+          margin-bottom:10px;text-align:center;
+        ">Kullanıcı adı veya şifre hatalı!</div>
+        <button id="btnAdminLoginConfirm" style="
+          width:100%;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);
+          color:#fff;border:none;border-radius:8px;font-size:15px;
+          font-weight:600;cursor:pointer;
+        ">Giriş Yap</button>
       </div>
     </div>
 

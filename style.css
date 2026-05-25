@@ -633,7 +633,18 @@ header a img {
   background: #e0e0e0;
   color: #333;
 }
+.logo-section {
+  cursor: default;
+}
+.btn-warning:hover {
+  background-color: #f0c02f;
+  transform: scale(0.95);
+}
 
+.btn-primary:hover {
+  background-color: #4086ee;
+  transform: scale(0.95);
+}
 .alert-box {
   background: #ffe3e3;
   border: 1px solid #ffb3b3;
@@ -646,31 +657,40 @@ header a img {
 
 /* ادمین پنل */
 .admin-modal-wrapper {
+  background: #f8f9fa; /* رنگ پس‌زمینه پنل */
+  padding: 20px;
   width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  border-radius: 12px;
 }
-
+.admin-header {
+  background: #f3aeae;
+  padding: 15px;
+  border-radius: 0px;
+  text-align: center;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+/* ادمین پنل - بهبود موبایل */
 .admin-title-area {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
   border-bottom: 2px solid #edf2f7;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
-
 .btn-clear-all {
   background: #fff5f5;
   border: 1px solid #feb2b2;
   color: #c53030;
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .btn-clear-all:hover {
@@ -686,15 +706,35 @@ header a img {
   background: #fafafa;
   margin-bottom: 20px;
 }
-
+/* یکسان‌سازی دکمه‌ها */
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  align-items: stretch; /* این باعث می‌شود همه دکمه‌ها هم‌ارتفاع شوند */
+  width: 100%;
+}
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
-
+/* یکسان‌سازی استایل دکمه‌ها */
+.admin-actions .btn {
+  flex: 1; /* هر سه دکمه عرض مساوی می‌گیرند */
+  height: 50px; /* ارتفاع ثابت برای همه دکمه‌ها */
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0; /* حذف مارجین‌های اضافی */
+  border-radius: 8px;
+  font-weight: bold;
+}
+/* .admin-actions .btn :hover {
+  transform: scale(0.85);
+} */
 .admin-table th {
-  background: #f1f3f5;
+  background: #dededf;
   padding: 16px;
   text-align: left;
   font-weight: 700;
@@ -704,7 +744,7 @@ header a img {
 
 .admin-table td {
   padding: 16px;
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: 1px solid #dededf;
 }
 
 .btn-delete-row {
@@ -851,7 +891,9 @@ header a img {
   .btn {
     width: 100%;
   }
-
+  /* .btn:hover {
+    transform: scale(0.85);
+  } */
   .slots-grid {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -867,6 +909,34 @@ header a img {
     justify-content: flex-start;
     font-size: 15px;
     border-radius: 0;
+  }
+  .admin-title-area {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-clear-all,
+  .btn-change-password {
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-clear-all {
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
+    color: #c53030;
+  }
+
+  .btn-change-password {
+    background: #e0f2fe;
+    border: 1px solid #7dd3fc;
+    color: #0369a1;
+  }
+  .modal-box.admin-mode {
+    padding: 20px 15px;
   }
 }
 
@@ -1512,3 +1582,29 @@ header a img {
     padding: 80px 15px;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .admin-title-area {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-actions {
+    width: 100%;
+  }
+
+  .btn-clear-all,
+  .btn-change-password {
+    flex: 1;
+    text-align: center;
+    padding: 11px 16px;
+    font-size: 14px;
+  }
+}
+
+/* 
+#btnAdminBack {
+  margin-top: 15px;
+  padding: 12px 20px;
+  font-size: 15px;
+} */
