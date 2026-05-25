@@ -177,7 +177,7 @@ header a img {
   background:
     /**/
     linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
-    url("./pics/bg.jpg") center/cover no-repeat;
+    url("./pics/bg.JPG") center/cover no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1035,7 +1035,7 @@ header a img {
   background:
     /* */
     linear-gradient(rgba(0, 0, 0, 0.1), rgba(214, 212, 212, 0.1)),
-    url("./pics/Hizmetlerimiz.jpg") center/cover no-repeat fixed;
+    url("./pics/Hizmetlerimiz.JPG") center/cover no-repeat fixed;
   background-attachment: fixed;
   color: white;
   position: relative;
@@ -1249,7 +1249,7 @@ header a img {
   background:
     /* */
     linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
-    url("./pics/musteri.jpg") center/cover no-repeat fixed;
+    url("./pics/musteri.JPG") center/cover no-repeat fixed;
   background-attachment: fixed;
   color: white;
   position: relative;
